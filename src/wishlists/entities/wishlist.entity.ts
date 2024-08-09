@@ -7,7 +7,7 @@ import {
   ManyToOne,
   ManyToMany,
 } from 'typeorm';
-import { IsUrl, Length, Max } from 'class-validator';
+import { IsUrl, Length } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
 

@@ -10,8 +10,7 @@ import { IsEmail, IsOptional, IsString, IsUrl, Length } from 'class-validator';
 import { Wish } from 'src/wishes/entities/wish.entity';
 import { Offer } from 'src/offers/entities/offer.entity';
 import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class User {
