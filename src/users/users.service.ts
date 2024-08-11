@@ -1,10 +1,21 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOneOptions,
+  FindOptionsWhere,
+  QueryFailedError,
+  Repository,
+} from 'typeorm';
 import { hashValue } from 'src/helpers/hash';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
 @Injectable()
 export class UsersService {
@@ -14,14 +25,19 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     const { password } = createUserDto;
-    const qwer = await hashValue(password);
-    console.log(password);
-    console.log(qwer);
-    const user = await this.userRepository.create({
+    const user = this.userRepository.create({
       ...createUserDto,
       password: await hashValue(password),
     });
-    return await this.userRepository.save(user);
+
+    return this.userRepository.save(user).catch((err) => {
+      console.log(err);
+      if (err instanceof QueryFailedError) {
+        throw new BadRequestException(
+          'Пользователь с таким именем или электронной почтой уже зарегестрирован',
+        );
+      }
+    });
   }
 
   async findAll() {
@@ -50,7 +66,14 @@ export class UsersService {
     if (password) {
       updateUserDto.password = await hashValue(password);
     }
-    return await this.userRepository.save({ ...user, ...updateUserDto });
+    return await this.userRepository.save({ ...user, ...updateUserDto }).catch((err) => {
+      console.log(err);
+      if (err instanceof QueryFailedError) {
+        throw new BadRequestException(
+          'Пользователь с таким именем или электронной почтой уже зарегестрирован',
+        );
+      }
+    });;
   }
 
   async removeOne(query: FindOptionsWhere<User>, userId: number) {

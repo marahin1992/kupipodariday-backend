@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { IsEmail, IsOptional, IsString, IsUrl, Length } from 'class-validator';
 import { Wish } from 'src/wishes/entities/wish.entity';
@@ -13,6 +14,7 @@ import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
+@Unique(['username', 'email'])
 export class User {
   @ApiProperty({ description: 'Уникальный идентификатор' })
   @PrimaryGeneratedColumn()
@@ -49,7 +51,7 @@ export class User {
   avatar: string;
 
   @ApiProperty({ description: 'Имэйл' })
-  @Column()
+  @Column({ unique: true })
   @IsEmail()
   email: string;
 
