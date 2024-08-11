@@ -127,6 +127,18 @@ export class WishesService {
       relations: ['owner'],
     });
     const { name, link, image, price, description } = wish;
+    const myWishes = await this.findWishByOwnerId(user.id);
+    if (
+      myWishes.find(
+        (wish) =>
+          wish.name === name &&
+          wish.link === link &&
+          wish.price === price &&
+          wish.description === description,
+      )
+    ) {
+      throw new BadRequestException('Вы уже копировали этот подарок себе');
+    }
     const baseWish = { ...wish, copied: wish.copied + 1 };
     const newWish = await this.create(
       {
